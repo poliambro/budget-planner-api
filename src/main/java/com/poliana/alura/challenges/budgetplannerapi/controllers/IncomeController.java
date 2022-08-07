@@ -5,15 +5,17 @@ import com.poliana.alura.challenges.budgetplannerapi.controllers.form.FormIncome
 import com.poliana.alura.challenges.budgetplannerapi.models.Income;
 import com.poliana.alura.challenges.budgetplannerapi.repository.IncomeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/incomes")
@@ -31,5 +33,11 @@ public class IncomeController {
             return new ResponseEntity<>(new IncomeDto(income), HttpStatus.CREATED);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The income already exists!");
+    }
+
+    @GetMapping
+    public Page<IncomeDto> listIncomes(@PageableDefault(sort = "date", direction = Sort.Direction.DESC) Pageable pageable){
+        Page<Income> incomePage = incomeRepository.findAll(pageable);
+        return IncomeDto.convert(incomePage);
     }
 }
