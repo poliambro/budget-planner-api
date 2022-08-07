@@ -19,4 +19,10 @@ public class Expense {
     private String description;
     private BigDecimal amount;
     private LocalDate date;
+
+    public Expense(String description, BigDecimal amount, LocalDate date) {
+        this.description = description;
+        this.amount = amount;
+        this.date = date;
+    }
 }
