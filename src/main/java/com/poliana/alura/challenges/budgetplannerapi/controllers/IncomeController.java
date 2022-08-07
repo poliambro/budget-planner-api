@@ -61,4 +61,15 @@ public class IncomeController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> deleteIncome(@PathVariable Long id) {
+        Optional<Income> optional = incomeRepository.findById(id);
+        if(optional.isPresent()) {
+            incomeRepository.deleteById(id);
+            return ResponseEntity.ok("The income was successfully removed!");
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
