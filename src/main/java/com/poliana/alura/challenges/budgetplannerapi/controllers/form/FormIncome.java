@@ -30,4 +30,12 @@ public class FormIncome {
             return new Income(description, amount, date);
         return null;
     }
+
+    public Income update(Long id, IncomeRepository repository) {
+        Income income = repository.getReferenceById(id);
+        income.setDescription(this.description);
+        income.setAmount(this.amount);
+        income.setDate(this.date);
+        return income;
+    }
 }
