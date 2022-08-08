@@ -1,8 +1,10 @@
 package com.poliana.alura.challenges.budgetplannerapi.controllers;
 
 import com.poliana.alura.challenges.budgetplannerapi.controllers.dto.ExpenseDto;
+import com.poliana.alura.challenges.budgetplannerapi.controllers.dto.IncomeDto;
 import com.poliana.alura.challenges.budgetplannerapi.controllers.form.FormExpense;
 import com.poliana.alura.challenges.budgetplannerapi.models.Expense;
+import com.poliana.alura.challenges.budgetplannerapi.models.Income;
 import com.poliana.alura.challenges.budgetplannerapi.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,9 +38,14 @@ public class ExpenseController {
     }
 
     @GetMapping
-    public Page<ExpenseDto> listExpenses(@PageableDefault(sort = "date", direction = Sort.Direction.DESC) Pageable pageable){
-        Page<Expense> expensePage = expenseRepository.findAll(pageable);
-        return ExpenseDto.convert(expensePage);
+    public Page<ExpenseDto> listExpenses(@PageableDefault(sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
+                                         @RequestParam(required = false) String description){
+        if(description == null || description.trim().isEmpty()){
+            Page<Expense> expensePage = expenseRepository.findAll(pageable);
+            return ExpenseDto.convert(expensePage);
+        }
+        Page<Expense> expenses = expenseRepository.findByDescription(pageable, description);
+        return ExpenseDto.convert(expenses);
     }
 
     @GetMapping("/{id}")

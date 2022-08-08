@@ -1,6 +1,8 @@
 package com.poliana.alura.challenges.budgetplannerapi.repository;
 
 import com.poliana.alura.challenges.budgetplannerapi.models.Expense;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
@@ -12,4 +14,6 @@ import java.util.Optional;
 public interface ExpenseRepository extends PagingAndSortingRepository<Expense, Long>, JpaRepository<Expense, Long> {
 
     Optional<Expense> findByDescriptionAndDate(String description, LocalDate date);
+
+    Page<Expense> findByDescription(Pageable pageable, String description);
 }
