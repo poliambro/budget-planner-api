@@ -56,7 +56,7 @@ public class ExpenseController {
         Optional<Expense> optional = expenseRepository.findById(id);
         if(optional.isPresent()) {
             Expense expense = formExpense.update(id, expenseRepository);
-            return ResponseEntity.ok(expense);
+            return ResponseEntity.ok(new ExpenseDto(expense));
         }
         return ResponseEntity.notFound().build();
     }

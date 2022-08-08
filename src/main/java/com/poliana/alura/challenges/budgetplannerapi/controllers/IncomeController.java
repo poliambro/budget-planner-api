@@ -57,7 +57,7 @@ public class IncomeController {
         Optional<Income> optional = incomeRepository.findById(id);
         if(optional.isPresent()) {
             Income income = formIncome.update(id, incomeRepository);
-            return ResponseEntity.ok(income);
+            return ResponseEntity.ok(new IncomeDto(income));
         }
         return ResponseEntity.notFound().build();
     }
