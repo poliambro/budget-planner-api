@@ -37,9 +37,14 @@ public class IncomeController {
     }
 
     @GetMapping
-    public Page<IncomeDto> listIncomes(@PageableDefault(sort = "date", direction = Sort.Direction.DESC) Pageable pageable){
-        Page<Income> incomePage = incomeRepository.findAll(pageable);
-        return IncomeDto.convert(incomePage);
+    public Page<IncomeDto> listIncomes(@PageableDefault(sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
+                                       @RequestParam(required = false) String description){
+        if(description == null || description.trim().isEmpty()){
+            Page<Income> incomePage = incomeRepository.findAll(pageable);
+            return IncomeDto.convert(incomePage);
+        }
+        Page<Income> incomes = incomeRepository.findByDescription(pageable, description);
+        return IncomeDto.convert(incomes);
     }
 
     @GetMapping("/{id}")
