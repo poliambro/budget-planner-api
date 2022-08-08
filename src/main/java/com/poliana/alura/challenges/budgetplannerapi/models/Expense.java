@@ -19,10 +19,19 @@ public class Expense {
     private String description;
     private BigDecimal amount;
     private LocalDate date;
+    @Enumerated(EnumType.STRING)
+    private ExpenseCategory category = ExpenseCategory.MISCELLANEOUS;
 
     public Expense(String description, BigDecimal amount, LocalDate date) {
         this.description = description;
         this.amount = amount;
         this.date = date;
+    }
+
+    public Expense(String description, BigDecimal amount, LocalDate date, ExpenseCategory category) {
+        this.description = description;
+        this.amount = amount;
+        this.date = date;
+        this.category = category;
     }
 }

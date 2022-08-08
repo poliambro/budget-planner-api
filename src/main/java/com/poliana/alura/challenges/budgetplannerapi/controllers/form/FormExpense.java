@@ -1,6 +1,7 @@
 package com.poliana.alura.challenges.budgetplannerapi.controllers.form;
 
 import com.poliana.alura.challenges.budgetplannerapi.models.Expense;
+import com.poliana.alura.challenges.budgetplannerapi.models.ExpenseCategory;
 import com.poliana.alura.challenges.budgetplannerapi.repository.ExpenseRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,11 +23,15 @@ public class FormExpense {
     private BigDecimal amount;
     @NotNull
     private LocalDate date;
+    private ExpenseCategory category;
 
     public Expense convert(ExpenseRepository repository){
         Optional<Expense> byDescriptionAndDate = repository.findByDescriptionAndDate(description, date);
-        if(byDescriptionAndDate.isEmpty())
-            return new Expense(description, amount, date);
+        if(byDescriptionAndDate.isEmpty()){
+            if(category == null)
+                return new Expense(description, amount, date);
+            return new Expense(description, amount, date, category);
+        }
         return null;
     }
 
@@ -35,6 +40,10 @@ public class FormExpense {
         expense.setDescription(this.description);
         expense.setAmount(this.amount);
         expense.setDate(this.date);
+        if(category == null)
+            expense.setCategory(ExpenseCategory.MISCELLANEOUS);
+        else
+            expense.setCategory(this.category);
         return expense;
     }
 }
