@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.util.List;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -76,5 +76,14 @@ public class IncomeController {
             return ResponseEntity.ok("The income was successfully removed!");
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{year}/{month}")
+    public Page<IncomeDto> listIncomesByYearAndMonth(@PageableDefault(sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
+                                                     @PathVariable int year, @PathVariable int month){
+        LocalDate minDate = LocalDate.of(year, month, 1);
+        LocalDate maxDate = LocalDate.of(year, month, minDate.lengthOfMonth());
+        Page<Income> incomes = incomeRepository.findByYearAndMonth(pageable, minDate, maxDate);
+        return IncomeDto.convert(incomes);
     }
 }
