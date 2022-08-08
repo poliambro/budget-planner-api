@@ -48,7 +48,7 @@ public class IncomeController {
         if(income.isEmpty()){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(income);
+        return ResponseEntity.ok(new IncomeDto(income.get()));
     }
 
     @PutMapping("/{id}")

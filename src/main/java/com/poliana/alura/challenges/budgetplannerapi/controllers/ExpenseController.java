@@ -47,7 +47,7 @@ public class ExpenseController {
         if(expense.isEmpty()){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(expense);
+        return ResponseEntity.ok(new ExpenseDto(expense.get()));
     }
 
     @PutMapping("/{id}")
