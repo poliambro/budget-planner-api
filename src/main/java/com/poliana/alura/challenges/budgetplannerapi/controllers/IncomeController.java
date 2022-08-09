@@ -3,7 +3,6 @@ package com.poliana.alura.challenges.budgetplannerapi.controllers;
 import com.poliana.alura.challenges.budgetplannerapi.controllers.dto.IncomeDto;
 import com.poliana.alura.challenges.budgetplannerapi.controllers.form.FormIncome;
 import com.poliana.alura.challenges.budgetplannerapi.models.Income;
-import com.poliana.alura.challenges.budgetplannerapi.models.MonthlySummary;
 import com.poliana.alura.challenges.budgetplannerapi.repository.IncomeRepository;
 import com.poliana.alura.challenges.budgetplannerapi.repository.MonthlySummaryRepository;
 import org.springframework.beans.factory.annotation.Autowired;

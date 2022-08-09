@@ -39,6 +39,7 @@ public class FormExpense {
         Expense expense = repository.getReferenceById(id);
         expense.setDescription(this.description);
         expense.setAmount(this.amount);
+        expense.getMonthlySummary().updateCashBalance();
         expense.setDate(this.date);
         if(category == null)
             expense.setCategory(ExpenseCategory.MISCELLANEOUS);
