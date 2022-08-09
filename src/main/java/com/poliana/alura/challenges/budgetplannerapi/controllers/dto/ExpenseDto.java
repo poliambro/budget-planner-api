@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class ExpenseDto {
@@ -28,5 +30,11 @@ public class ExpenseDto {
 
     public static Page<ExpenseDto> convert(Page<Expense> expensePage) {
         return expensePage.map(ExpenseDto::new);
+    }
+
+    public static List<ExpenseDto> convert(List<Expense> expenses){
+        List<ExpenseDto> expensesDto = new ArrayList<>();
+        expenses.forEach(expense -> expensesDto.add(new ExpenseDto(expense)));
+        return expensesDto;
     }
 }

@@ -21,6 +21,8 @@ public class Expense {
     private LocalDate date;
     @Enumerated(EnumType.STRING)
     private ExpenseCategory category = ExpenseCategory.MISCELLANEOUS;
+    @ManyToOne
+    private MonthlySummary monthlySummary;
 
     public Expense(String description, BigDecimal amount, LocalDate date) {
         this.description = description;

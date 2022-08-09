@@ -3,7 +3,9 @@ package com.poliana.alura.challenges.budgetplannerapi.controllers;
 import com.poliana.alura.challenges.budgetplannerapi.controllers.dto.IncomeDto;
 import com.poliana.alura.challenges.budgetplannerapi.controllers.form.FormIncome;
 import com.poliana.alura.challenges.budgetplannerapi.models.Income;
+import com.poliana.alura.challenges.budgetplannerapi.models.MonthlySummary;
 import com.poliana.alura.challenges.budgetplannerapi.repository.IncomeRepository;
+import com.poliana.alura.challenges.budgetplannerapi.repository.MonthlySummaryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,11 +27,15 @@ public class IncomeController {
     @Autowired
     private IncomeRepository incomeRepository;
 
+    @Autowired
+    private MonthlySummaryRepository monthlySummaryRepository;
+
     @PostMapping
     @Transactional
     public ResponseEntity<?> newIncome(@RequestBody @Valid FormIncome formIncome) {
         Income income = formIncome.convert(incomeRepository);
         if (income != null) {
+            income.addSummary(monthlySummaryRepository);
             incomeRepository.save(income);
             return new ResponseEntity<>(new IncomeDto(income), HttpStatus.CREATED);
         }
@@ -73,6 +79,7 @@ public class IncomeController {
         Optional<Income> optional = incomeRepository.findById(id);
         if(optional.isPresent()) {
             incomeRepository.deleteById(id);
+            optional.get().updateSummaryOnDelete(monthlySummaryRepository);
             return ResponseEntity.ok("The income was successfully removed!");
         }
         return ResponseEntity.notFound().build();

@@ -35,6 +35,7 @@ public class FormIncome {
         Income income = repository.getReferenceById(id);
         income.setDescription(this.description);
         income.setAmount(this.amount);
+        income.getMonthlySummary().updateCashBalance();
         income.setDate(this.date);
         return income;
     }
