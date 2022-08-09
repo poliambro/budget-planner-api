@@ -21,6 +21,7 @@ public class MonthlySummary {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private int month;
+    private int year;
     @OneToMany(mappedBy = "monthlySummary")
     private List<Income> incomes = new ArrayList<>();
     @OneToMany(mappedBy = "monthlySummary")
@@ -29,7 +30,8 @@ public class MonthlySummary {
     @MapKeyEnumerated(EnumType.STRING)
     private HashMap<ExpenseCategory, BigDecimal> categoryExpenses = new HashMap<>();
 
-    public MonthlySummary(int month) {
+    public MonthlySummary(int year, int month) {
+        this.year = year;
         this.month = month;
     }
 

@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface MonthlySummaryRepository extends PagingAndSortingRepository<MonthlySummary, Long>, JpaRepository<MonthlySummary, Long> {
 
-    Optional<MonthlySummary> findByMonth(int month);
+    Optional<MonthlySummary> findByYearAndMonth(int year, int month);
 }

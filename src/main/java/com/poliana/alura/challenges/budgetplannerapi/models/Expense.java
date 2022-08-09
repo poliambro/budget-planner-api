@@ -40,11 +40,11 @@ public class Expense {
     }
 
     public void addExpense(MonthlySummaryRepository repository) {
-        Optional<MonthlySummary> summary = repository.findByMonth(date.getMonthValue());
+        Optional<MonthlySummary> summary = repository.findByYearAndMonth(date.getYear(), date.getMonthValue());
         if(summary.isPresent()){
             updateAndSaveSummary(repository, summary.get());
         } else {
-            MonthlySummary monthlySummary = new MonthlySummary(date.getMonthValue());
+            MonthlySummary monthlySummary = new MonthlySummary(date.getYear(), date.getMonthValue());
             updateAndSaveSummary(repository, monthlySummary);
         }
     }

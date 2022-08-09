@@ -28,11 +28,11 @@ public class Income {
     }
 
     public void addSummary(MonthlySummaryRepository monthlySummaryRepository) {
-        Optional<MonthlySummary> summary = monthlySummaryRepository.findByMonth(date.getMonthValue());
+        Optional<MonthlySummary> summary = monthlySummaryRepository.findByYearAndMonth(date.getYear(), date.getMonthValue());
         if(summary.isPresent()){
             updateAndSaveSummary(monthlySummaryRepository, summary.get());
         } else {
-            MonthlySummary monthlySummary = new MonthlySummary(date.getMonthValue());
+            MonthlySummary monthlySummary = new MonthlySummary(date.getYear(), date.getMonthValue());
             updateAndSaveSummary(monthlySummaryRepository, monthlySummary);
         }
     }

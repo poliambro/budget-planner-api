@@ -19,6 +19,7 @@ import java.util.List;
 public class MonthlySummaryDto {
 
     private int month;
+    private int year;
     private List<IncomeDto> incomes;
     private List<ExpenseDto> expenses;
     private BigDecimal cashBalance;
@@ -26,6 +27,7 @@ public class MonthlySummaryDto {
 
     public MonthlySummaryDto(MonthlySummary monthlySummary) {
         month = monthlySummary.getMonth();
+        year = monthlySummary.getYear();
         incomes = IncomeDto.convert(monthlySummary.getIncomes());
         expenses = ExpenseDto.convert(monthlySummary.getExpenses());
         cashBalance = monthlySummary.getCashBalance();
