@@ -51,12 +51,15 @@ public class Expense {
     private void updateAndSaveSummary(MonthlySummaryRepository repository, MonthlySummary summary) {
         summary.getExpenses().add(this);
         summary.updateCashBalance();
+        summary.updateCategoryExpenses();
         repository.save(summary);
         setMonthlySummary(summary);
     }
 
     public void updateSummaryOnDelete(MonthlySummaryRepository repository) {
         monthlySummary.setCashBalance(monthlySummary.getCashBalance().add(amount));
+        BigDecimal currentTotalExpense = monthlySummary.getCategoryExpenses().get(category);
+        monthlySummary.getCategoryExpenses().put(category, currentTotalExpense.subtract(amount));
         repository.save(monthlySummary);
     }
 }

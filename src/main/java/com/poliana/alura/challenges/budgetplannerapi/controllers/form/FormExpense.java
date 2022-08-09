@@ -40,6 +40,7 @@ public class FormExpense {
         expense.setDescription(this.description);
         expense.setAmount(this.amount);
         expense.getMonthlySummary().updateCashBalance();
+        expense.getMonthlySummary().updateCategoryExpenses();
         expense.setDate(this.date);
         if(category == null)
             expense.setCategory(ExpenseCategory.MISCELLANEOUS);
