@@ -3,6 +3,7 @@ package com.poliana.alura.challenges.budgetplannerapi.controllers;
 import com.poliana.alura.challenges.budgetplannerapi.models.Income;
 import com.poliana.alura.challenges.budgetplannerapi.repository.IncomeRepository;
 import com.poliana.alura.challenges.budgetplannerapi.repository.MonthlySummaryRepository;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -13,12 +14,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,7 +46,7 @@ class IncomeControllerTest {
                     .post("/incomes")
                     .content(json)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is(201));
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -55,6 +58,31 @@ class IncomeControllerTest {
                         .post("/incomes")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is(400));
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnOkForDetailingExistingIncome() throws Exception {
+        Income income = new Income("salary", new BigDecimal("5000"), LocalDate.of(2022, 8, 10));
+        when(incomeRepository.findById(1L)).thenReturn(Optional.of(income));
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+                        .get("/incomes/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        JSONObject jsonObject = new JSONObject(response);
+        assertEquals(income.getDescription(), jsonObject.get("description"));
+        assertEquals(income.getAmount().toString(), jsonObject.getString("amount"));
+        assertEquals(income.getDate().toString(), jsonObject.getString("date"));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenTheIncomeDoesNotExist() throws Exception{
+        when(incomeRepository.findById(1L)).thenReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/incomes/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }
