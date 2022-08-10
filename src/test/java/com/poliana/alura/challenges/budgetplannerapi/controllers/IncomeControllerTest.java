@@ -23,7 +23,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -114,6 +114,26 @@ class IncomeControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.put("/incomes/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturnOkWhenDeletingAnExistingIncome() throws Exception {
+        Income income = new Income("salary", new BigDecimal("5000"), LocalDate.of(2022, 8, 10));
+        income.setMonthlySummary(new MonthlySummary(2022, 8));
+        when(incomeRepository.findById(Mockito.any())).thenReturn(Optional.of(income));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/incomes/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        verify(incomeRepository, times(1)).deleteById(Mockito.any());
+        verify(summaryRepository, times(1)).save(Mockito.any());
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenTheIncomeDoesNotExistUponDeletion() throws Exception {
+        when(incomeRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders.delete("/incomes/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 }
