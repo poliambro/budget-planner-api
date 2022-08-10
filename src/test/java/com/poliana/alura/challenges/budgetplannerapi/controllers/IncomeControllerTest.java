@@ -1,6 +1,7 @@
 package com.poliana.alura.challenges.budgetplannerapi.controllers;
 
 import com.poliana.alura.challenges.budgetplannerapi.models.Income;
+import com.poliana.alura.challenges.budgetplannerapi.models.MonthlySummary;
 import com.poliana.alura.challenges.budgetplannerapi.repository.IncomeRepository;
 import com.poliana.alura.challenges.budgetplannerapi.repository.MonthlySummaryRepository;
 import org.json.JSONObject;
@@ -79,10 +80,40 @@ class IncomeControllerTest {
 
     @Test
     void shouldReturnNotFoundWhenTheIncomeDoesNotExist() throws Exception{
-        when(incomeRepository.findById(1L)).thenReturn(Optional.empty());
+        when(incomeRepository.findById(Mockito.any())).thenReturn(Optional.empty());
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/incomes/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturnOkWhenUpdatingExistingIncome() throws Exception {
+        Income income = new Income("salary", new BigDecimal("5000"), LocalDate.of(2022, 8, 10));
+        income.setMonthlySummary(new MonthlySummary(2022, 8));
+        String json = "{\"description\":\"New job\",\"amount\":2000,\"date\":\"2022-08-15\"}";
+        when(incomeRepository.findById(Mockito.any())).thenReturn(Optional.of(income));
+        when(incomeRepository.getReferenceById(Mockito.any())).thenReturn(income);
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+                        .put("/incomes/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        JSONObject jsonObject = new JSONObject(response);
+        assertEquals("New job", jsonObject.get("description"));
+        assertEquals("2000", jsonObject.getString("amount"));
+        assertEquals("2022-08-15", jsonObject.getString("date"));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenTheIncomeDoesNotExistUponUpdate() throws Exception {
+        String json = "{\"description\":\"New job\",\"amount\":2000,\"date\":\"2022-08-15\"}";
+        when(incomeRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+        mockMvc.perform(MockMvcRequestBuilders.put("/incomes/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
                 .andExpect(status().isNotFound());
     }
 }
