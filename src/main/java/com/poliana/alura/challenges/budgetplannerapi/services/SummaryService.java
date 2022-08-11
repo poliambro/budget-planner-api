@@ -15,8 +15,12 @@ import java.util.Optional;
 @Service
 public class SummaryService {
 
+    private final MonthlySummaryRepository monthlySummaryRepository;
+
     @Autowired
-    MonthlySummaryRepository monthlySummaryRepository;
+    public SummaryService(MonthlySummaryRepository monthlySummaryRepository) {
+        this.monthlySummaryRepository = monthlySummaryRepository;
+    }
 
     public void addIncomeToSummary(Income income) {
         Optional<MonthlySummary> summary = monthlySummaryRepository.findByYearAndMonth(income.getDate().getYear(), income.getDate().getMonthValue());
