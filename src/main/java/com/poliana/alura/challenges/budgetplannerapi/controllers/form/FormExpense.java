@@ -1,7 +1,9 @@
 package com.poliana.alura.challenges.budgetplannerapi.controllers.form;
 
 import com.poliana.alura.challenges.budgetplannerapi.models.Expense;
+import com.poliana.alura.challenges.budgetplannerapi.models.ExpenseCategory;
 import com.poliana.alura.challenges.budgetplannerapi.repository.ExpenseRepository;
+import com.poliana.alura.challenges.budgetplannerapi.services.SummaryService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,19 +24,29 @@ public class FormExpense {
     private BigDecimal amount;
     @NotNull
     private LocalDate date;
+    private ExpenseCategory category;
 
     public Expense convert(ExpenseRepository repository){
         Optional<Expense> byDescriptionAndDate = repository.findByDescriptionAndDate(description, date);
-        if(byDescriptionAndDate.isEmpty())
-            return new Expense(description, amount, date);
+        if(byDescriptionAndDate.isEmpty()){
+            if(category == null)
+                return new Expense(description, amount, date);
+            return new Expense(description, amount, date, category);
+        }
         return null;
     }
 
-    public Expense update(Long id, ExpenseRepository repository) {
+    public Expense update(Long id, ExpenseRepository repository, SummaryService summaryService) {
         Expense expense = repository.getReferenceById(id);
         expense.setDescription(this.description);
         expense.setAmount(this.amount);
+        summaryService.updateCashBalance(expense.getMonthlySummary());
+        summaryService.updateCategoryExpenses(expense.getMonthlySummary());
         expense.setDate(this.date);
+        if(category == null)
+            expense.setCategory(ExpenseCategory.MISCELLANEOUS);
+        else
+            expense.setCategory(this.category);
         return expense;
     }
 }

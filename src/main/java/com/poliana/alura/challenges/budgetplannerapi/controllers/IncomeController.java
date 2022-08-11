@@ -4,6 +4,7 @@ import com.poliana.alura.challenges.budgetplannerapi.controllers.dto.IncomeDto;
 import com.poliana.alura.challenges.budgetplannerapi.controllers.form.FormIncome;
 import com.poliana.alura.challenges.budgetplannerapi.models.Income;
 import com.poliana.alura.challenges.budgetplannerapi.repository.IncomeRepository;
+import com.poliana.alura.challenges.budgetplannerapi.services.SummaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.util.List;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -25,11 +26,15 @@ public class IncomeController {
     @Autowired
     private IncomeRepository incomeRepository;
 
+    @Autowired
+    private SummaryService summaryService;
+
     @PostMapping
     @Transactional
     public ResponseEntity<?> newIncome(@RequestBody @Valid FormIncome formIncome) {
         Income income = formIncome.convert(incomeRepository);
         if (income != null) {
+            summaryService.addIncomeToSummary(income);
             incomeRepository.save(income);
             return new ResponseEntity<>(new IncomeDto(income), HttpStatus.CREATED);
         }
@@ -37,9 +42,14 @@ public class IncomeController {
     }
 
     @GetMapping
-    public Page<IncomeDto> listIncomes(@PageableDefault(sort = "date", direction = Sort.Direction.DESC) Pageable pageable){
-        Page<Income> incomePage = incomeRepository.findAll(pageable);
-        return IncomeDto.convert(incomePage);
+    public Page<IncomeDto> listIncomes(@PageableDefault(sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
+                                       @RequestParam(required = false) String description){
+        if(description == null || description.trim().isEmpty()){
+            Page<Income> incomePage = incomeRepository.findAll(pageable);
+            return IncomeDto.convert(incomePage);
+        }
+        Page<Income> incomes = incomeRepository.findByDescription(pageable, description);
+        return IncomeDto.convert(incomes);
     }
 
     @GetMapping("/{id}")
@@ -48,7 +58,7 @@ public class IncomeController {
         if(income.isEmpty()){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(income);
+        return ResponseEntity.ok(new IncomeDto(income.get()));
     }
 
     @PutMapping("/{id}")
@@ -56,8 +66,8 @@ public class IncomeController {
     public ResponseEntity<?> updateIncome(@PathVariable Long id, @RequestBody @Valid FormIncome formIncome) {
         Optional<Income> optional = incomeRepository.findById(id);
         if(optional.isPresent()) {
-            Income income = formIncome.update(id, incomeRepository);
-            return ResponseEntity.ok(income);
+            Income income = formIncome.update(id, incomeRepository, summaryService);
+            return ResponseEntity.ok(new IncomeDto(income));
         }
         return ResponseEntity.notFound().build();
     }
@@ -68,8 +78,18 @@ public class IncomeController {
         Optional<Income> optional = incomeRepository.findById(id);
         if(optional.isPresent()) {
             incomeRepository.deleteById(id);
+            summaryService.updateSummaryUponIncomeDeletion(optional.get());
             return ResponseEntity.ok("The income was successfully removed!");
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{year}/{month}")
+    public Page<IncomeDto> listIncomesByYearAndMonth(@PageableDefault(sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
+                                                     @PathVariable int year, @PathVariable int month){
+        LocalDate minDate = LocalDate.of(year, month, 1);
+        LocalDate maxDate = LocalDate.of(year, month, minDate.lengthOfMonth());
+        Page<Income> incomes = incomeRepository.findByYearAndMonth(pageable, minDate, maxDate);
+        return IncomeDto.convert(incomes);
     }
 }

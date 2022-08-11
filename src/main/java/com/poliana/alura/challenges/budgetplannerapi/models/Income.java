@@ -16,6 +16,8 @@ public class Income {
     private String description;
     private BigDecimal amount;
     private LocalDate date;
+    @ManyToOne
+    private MonthlySummary monthlySummary;
 
     public Income(String description, BigDecimal amount, LocalDate date) {
         this.description = description;

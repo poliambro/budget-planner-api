@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class IncomeDto {
@@ -25,5 +27,11 @@ public class IncomeDto {
 
     public static Page<IncomeDto> convert(Page<Income> incomePage) {
         return incomePage.map(IncomeDto::new);
+    }
+
+    public static List<IncomeDto> convert(List<Income> incomes){
+        List<IncomeDto> incomesDto = new ArrayList<>();
+        incomes.forEach(income -> incomesDto.add(new IncomeDto(income)));
+        return incomesDto;
     }
 }
