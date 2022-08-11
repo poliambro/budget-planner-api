@@ -5,6 +5,7 @@ import com.poliana.alura.challenges.budgetplannerapi.models.ExpenseCategory;
 import com.poliana.alura.challenges.budgetplannerapi.models.MonthlySummary;
 import com.poliana.alura.challenges.budgetplannerapi.repository.ExpenseRepository;
 import com.poliana.alura.challenges.budgetplannerapi.repository.MonthlySummaryRepository;
+import com.poliana.alura.challenges.budgetplannerapi.services.SummaryService;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -37,10 +38,10 @@ class ExpenseControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    ExpenseRepository expenseRepository;
+    SummaryService summaryService;
 
     @MockBean
-    MonthlySummaryRepository summaryRepository;
+    ExpenseRepository expenseRepository;
 
     @Test
     void shouldAddNewExpense() throws Exception {
@@ -50,6 +51,7 @@ class ExpenseControllerTest {
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
+        verify(summaryService, times(1)).addExpenseToSummary(Mockito.any());
     }
 
     @Test
@@ -94,6 +96,8 @@ class ExpenseControllerTest {
         Expense expense = new Expense("emergency", new BigDecimal("5000"), LocalDate.of(2022, 8, 10));
         expense.setMonthlySummary(new MonthlySummary(2022, 8));
         String json = "{\"description\":\"New job\",\"amount\":2000,\"date\":\"2022-08-15\"}";
+        doCallRealMethod().when(summaryService).updateCashBalance(Mockito.any());
+        doCallRealMethod().when(summaryService).updateCategoryExpenses(Mockito.any());
         when(expenseRepository.findById(Mockito.any())).thenReturn(Optional.of(expense));
         when(expenseRepository.getReferenceById(Mockito.any())).thenReturn(expense);
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
@@ -130,7 +134,7 @@ class ExpenseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         verify(expenseRepository, times(1)).deleteById(Mockito.any());
-        verify(summaryRepository, times(1)).save(Mockito.any());
+        verify(summaryService, times(1)).updateSummaryUponExpenseDeletion(Mockito.any());
     }
 
     @Test

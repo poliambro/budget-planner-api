@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 
 import com.poliana.alura.challenges.budgetplannerapi.models.Income;
 import com.poliana.alura.challenges.budgetplannerapi.repository.IncomeRepository;
+import com.poliana.alura.challenges.budgetplannerapi.services.SummaryService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,11 +32,11 @@ public class FormIncome {
         return null;
     }
 
-    public Income update(Long id, IncomeRepository repository) {
+    public Income update(Long id, IncomeRepository repository, SummaryService summaryService) {
         Income income = repository.getReferenceById(id);
         income.setDescription(this.description);
         income.setAmount(this.amount);
-        income.getMonthlySummary().updateCashBalance();
+        summaryService.updateCashBalance(income.getMonthlySummary());
         income.setDate(this.date);
         return income;
     }

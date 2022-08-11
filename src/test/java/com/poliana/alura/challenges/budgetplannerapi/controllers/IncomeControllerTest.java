@@ -3,7 +3,7 @@ package com.poliana.alura.challenges.budgetplannerapi.controllers;
 import com.poliana.alura.challenges.budgetplannerapi.models.Income;
 import com.poliana.alura.challenges.budgetplannerapi.models.MonthlySummary;
 import com.poliana.alura.challenges.budgetplannerapi.repository.IncomeRepository;
-import com.poliana.alura.challenges.budgetplannerapi.repository.MonthlySummaryRepository;
+import com.poliana.alura.challenges.budgetplannerapi.services.SummaryService;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +38,7 @@ class IncomeControllerTest {
     IncomeRepository incomeRepository;
 
     @MockBean
-    MonthlySummaryRepository summaryRepository;
+    SummaryService summaryService;
 
     @Test
     void shouldAddNewIncome() throws Exception {
@@ -126,7 +126,6 @@ class IncomeControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         verify(incomeRepository, times(1)).deleteById(Mockito.any());
-        verify(summaryRepository, times(1)).save(Mockito.any());
     }
 
     @Test
